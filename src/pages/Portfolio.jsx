@@ -35,35 +35,6 @@ export default function Portfolio() {
   const locations = [...new Set(projects?.map(p => p.location).filter(Boolean))];
   const styles = [...new Set(projects?.map(p => p.architectural_style).filter(Boolean))];
 
-  const filteredProjects = projects?.map(p => ({
-    ...p,
-    image_url: PROJECT_IMAGES[p.title] || p.image_url
-  })).filter(project => {
-    const matchLocation = !filters.location || project.location === filters.location;
-    const matchStyle = !filters.architecturalStyle || project.architectural_style === filters.architecturalStyle;
-    
-    // Simple parsing for sq ft comparison (assuming format "5,000 sq ft" or similar)
-    const sqFt = parseInt(project.square_footage?.replace(/[^0-9]/g, '') || 0);
-    const matchSqFt = !filters.minSquareFootage || sqFt >= parseInt(filters.minSquareFootage);
-    
-    // Year range
-    const year = project.year_built || parseInt(project.completion_year) || 0;
-    let matchYear = true;
-    if (filters.yearRange === 'new') matchYear = year >= 2023;
-    if (filters.yearRange === 'classic') matchYear = year < 2020;
-
-    return matchLocation && matchStyle && matchSqFt && matchYear;
-  });
-
-  const clearFilters = () => {
-    setFilters({
-      location: '',
-      minSquareFootage: '',
-      architecturalStyle: '',
-      yearRange: 'all'
-    });
-  };
-
   return (
     <div className="pt-20 bg-stone-50 min-h-screen">
       <SEO 
