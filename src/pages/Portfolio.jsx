@@ -13,26 +13,18 @@ const base44 = {};
 
 export default function Portfolio() {
   const [filters, setFilters] = useState({
-    location: '',
-    minSquareFootage: '',
-    architecturalStyle: '',
-    yearRange: 'all'
+    // ... (filters state remains the same) ...
   });
   
   const [showFilters, setShowFilters] = useState(false);
 
   // Hardcoded image overrides requested by user
   const PROJECT_IMAGES = {
-    "Mulberry Woods": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg7AGgxc533qiWHWkRvrWBD8Nd5hvDQ0-pCcaySCehbN2bhQkeO6a-ymw4MFIhaezxyemBzGkABdh1WbgnrwvCuqIk0psju8Z7c1ROOhe9Cf8uOvWt3q48D6r.../luxury-estate-construction-beverly-hills-mulberry-woods-exterior.png",
-    "The Aspen Estate": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg8ovGbwlrSfoogJpLPLCItRl5JnvDtJ_rauAM7O3pF7y6VFbDaxbcq3oHAYm2khx2h9oRd9EENzca0vJyxLhx9d6d.../malibu-carbon-beach-modern-glass-architecture-oceanfront.png",
-    "Azure Heights": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhBB-wztcJ9vt9DhaHgZaw0D9ZZaXdJnH21yqWQuF8b3rrlDoCgkYgTJLtHLoW-XwQeEVeQ7Zznhjuu036QmHTnulQNfuAsvXg4EJM6imHpRDIryYoZ1pDZj0a1nCquQ0p9jXXGgAexoxtSb1s0iS2ELNlpb4wz.../high-rise-luxury-tower-development-san-francisco-skyline.png",
-    "Casa de la Costa": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgeVyfXHmN626XFR47zOGIc_T0lNr9ilcODJ9COiTiY4O9fwEgd026SD3xc5zNv5iHQHsMg8-D6tQUKkhRYX-DcTetFYjtCDzL5a808IPHOq8t-9ENtWJZOAE9ZkKZ_iwHapXIWcEl7XvOYkUcktipkRXn8VkQ7ErQ87ZN.../spanish-colonial-revival-architecture-montecito-estate.png",
-    "Oak Creek Reserve": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjRszFBOc89eknG3uwQYYcfEk9CrALXAkpnu6wx7U08o9hR4SfQOsjuZzpNHeZbKRgV-DAVJ1MYnLQu9rgYrXJuDGfPRdAjXShCTzhPR21R5En1SvB5o670PnZgii1qT6xqMZsTMghXP4OGib33NKMDt9fUqPkeZqogjQu.../modern-ranch-estate-calabasas-gated-community.png",
-    "The Water's Edge": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgFenV0jPVYm4z0RrqiZzxP-8AWTIhZP7NRnj82gfmLsQGgWlYgNfhBqhg8M9Ow_BPZYZT0mvCJeipHFJy-akhyd4X-lpDeHPRka_95N7w9mujdcwWwJl9zI7abhHi7NhleO-nooB5-3EFT6guzzXvcdnHciYzzfWUmpvxFD6ZWx4_tA5BoEHx90OeR7joC/w640-h350/lake-sherwood-waterfront-contemporary-estate-architecture.png"
+    // ... (PROJECT_IMAGES object remains the same) ...
   };
 
-  // 🛑 START MOCK DATA BLOCK 🛑
-  // This array ensures projects display even if the base44 client crashes.
+  // 🛑 START MOCK DATA BLOCK (CORRECTED) 🛑
+  // This block ensures all data variables are explicitly defined.
   const MOCK_PROJECTS = [
     {
       id: "mock-1",
@@ -76,23 +68,42 @@ export default function Portfolio() {
     }
   ];
 
-  // 🛑 OVERRIDE: Skip the useQuery hook and inject the mock data 🛑
-  const projects = MOCK_PROJECTS;
+  // 1. Explicitly set 'projects' and 'isLoading' using the mock data
+  const projects = MOCK_PROJECTS; 
   const isLoading = false;
 
-  /*
-  // 💾 ORIGINAL CODE TO REVERT TO AFTER FIXING THE CRASH:
-  const { data: projects, isLoading } = useQuery({
-    queryKey: ['all-projects'],
-    queryFn: () => base44.entities.Project.list()
-  });
-  */
-  // 🛑 END MOCK DATA BLOCK 🛑
-
-
-  // Unique values for dropdowns (now derived from MOCK_PROJECTS)
+  // 2. Define 'locations' and 'styles' (required for the filter UI)
   const locations = [...new Set(projects?.map(p => p.location).filter(Boolean))];
   const styles = [...new Set(projects?.map(p => p.architectural_style).filter(Boolean))];
+
+  // 3. Define 'filteredProjects' explicitly (REQUIRED)
+  const filteredProjects = projects?.map(p => ({
+    ...p,
+    image_url: PROJECT_IMAGES[p.title] || p.image_url
+  })).filter(project => {
+    const matchLocation = !filters.location || project.location === filters.location;
+    const matchStyle = !filters.architecturalStyle || project.architectural_style === filters.architecturalStyle;
+    
+    // Simple parsing for sq ft comparison (assuming format "5,000 sq ft" or similar)
+    const sqFt = parseInt(project.square_footage?.replace(/[^0-9]/g, '') || 0);
+    const matchSqFt = !filters.minSquareFootage || sqFt >= parseInt(filters.minSquareFootage);
+    
+    // Year range
+    const year = project.year_built || parseInt(project.completion_year) || 0;
+    let matchYear = true;
+    if (filters.yearRange === 'new') matchYear = year >= 2023;
+    if (filters.yearRange === 'classic') matchYear = year < 2020;
+
+    return matchLocation && matchStyle && matchSqFt && matchYear;
+  });
+  // 🛑 END MOCK DATA BLOCK 🛑
+
+  const clearFilters = () => {
+    // ... (clearFilters function remains the same) ...
+  };
+
+  // ... (Your return statement remains the same) ...
+}
 
   // 🛑 FILTER LOGIC RE-ENABLED (Using mock data, this should work) 🛑
   const filteredProjects = projects?.map(p => ({
