@@ -12,8 +12,6 @@ export default function Portfolio() {
     architecturalStyle: '',
     yearRange: 'all'
   });
-  
-  const [showFilters, setShowFilters] = useState(false);
 
   // Hardcoded image overrides requested by user
   const PROJECT_IMAGES = {
