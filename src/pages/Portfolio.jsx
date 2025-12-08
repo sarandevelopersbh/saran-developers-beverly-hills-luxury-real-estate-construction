@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+// The following two imports are temporarily unused but kept for the final fix
+// import { base44 } from '@/api/base44Client'; 
+// import { useQuery } from '@tanstack/react-query'; 
 import ProjectCard from '../components/ProjectCard';
 import { Search, Filter, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SEO from '../components/SEO';
+
+// 🛑 IMPORTANT: Replace useQuery imports with these temporary placeholders 🛑
+const useQuery = () => {}; 
+const base44 = {}; 
 
 export default function Portfolio() {
   const [filters, setFilters] = useState({
@@ -12,25 +18,113 @@ export default function Portfolio() {
     architecturalStyle: '',
     yearRange: 'all'
   });
+  
+  const [showFilters, setShowFilters] = useState(false);
 
   // Hardcoded image overrides requested by user
   const PROJECT_IMAGES = {
-    "Mulberry Woods": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg7AGgxc533qiWHWkRvrWBD8Nd5hvDQ0-pCcaySCehbN2bhQkeO6a-ymw4MFIhaezxyemBzGkABdh1WbgnrwvCuqIk0psju8Z7c1ROOhe9Cf8uOvWt3q48D8ruVomO9lvna6J0bYhUETZjq3bjm1tcVKzepS5VhL4Lh5_pH2iTzvPJsbZNW3bFUsT18thXH/w640-h350/luxury-estate-construction-beverly-hills-mulberry-woods-exterior.png",
-    "The Aspen Estate": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg8ovGbwlrSfoogJpLPLCItRl5JnvDtJ_rauAM7O3pF7y6VFbDaxbcq3oHAYm2khx2h9oRd9EENzca0vJyxLhx9d6dcx4NQ2TFPGa9J73-_3JCmeQtbgGuqBwEJcEDciFEMV_JTyGGNiOpP6uo4lLiuI5tTQWrR4jXgtxpTb5x_lPwzQ5NJXAn5b0dHTuxr/s2816/malibu-carbon-beach-modern-glass-architecture-oceanfront.png",
-    "Azure Heights": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhBB-wztcJ9vt9DhaHgZaw0D9ZZaXdJnH21yqWQuF8b3rrlDoCgkYgTJLtHLoW-XwQeEVeQ7Zznhjuu036QmHTnulQNfuAsvXg4EJM6imHpRDIryYoZ1pDZj0aQ1nCquQ0p9jXXGgAexoxtSb1s0iS2ELNlpb4wzvWv4E7_0oSiYMH05h3ydRb6uYgmE5mP/w640-h350/high-rise-luxury-tower-development-san-francisco-skyline.png",
-    "Casa de la Costa": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgeVyfXHmN626XFR47zOGIc_T0lNr9ilcODJ9COiTiY4O9fwEgd026SD3xc5zNv5iHQHsMg8-D6tQUKkhRYX-DcTetFYjtCDzL5a808IPHOq8t-9ENtWJZOAE9ZkKZ_iwHapXIWcEl7XvOYkUcktipkRXn8VkQ7ErQ87ZNhdwFpVJg3oK37_GEd33-JJ-lX/w640-h350/spanish-colonial-revival-architecture-montecito-estate.png",
-    "Oak Creek Reserve": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjRszFBOc89eknG3uwQYYcfEk9CrALXAkpnu6wx7U08o9hR4SfQOsjuZzpNHeZbKRgV-DAVJ1MYnLQu9rgYrXJuDGfPRdAjXShCTzhPR21R5En1SvB5o670PnZgii1qT6xqMZsTMghXP4OGib33NKMDt9fUqPkeZqogjQuTANBChyphenhyphenFTqBfqKIfExtkna60q/w640-h350/modern-ranch-estate-calabasas-gated-community.png",
+    "Mulberry Woods": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg7AGgxc533qiWHWkRvrWBD8Nd5hvDQ0-pCcaySCehbN2bhQkeO6a-ymw4MFIhaezxyemBzGkABdh1WbgnrwvCuqIk0psju8Z7c1ROOhe9Cf8uOvWt3q48D6r.../luxury-estate-construction-beverly-hills-mulberry-woods-exterior.png",
+    "The Aspen Estate": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg8ovGbwlrSfoogJpLPLCItRl5JnvDtJ_rauAM7O3pF7y6VFbDaxbcq3oHAYm2khx2h9oRd9EENzca0vJyxLhx9d6d.../malibu-carbon-beach-modern-glass-architecture-oceanfront.png",
+    "Azure Heights": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhBB-wztcJ9vt9DhaHgZaw0D9ZZaXdJnH21yqWQuF8b3rrlDoCgkYgTJLtHLoW-XwQeEVeQ7Zznhjuu036QmHTnulQNfuAsvXg4EJM6imHpRDIryYoZ1pDZj0a1nCquQ0p9jXXGgAexoxtSb1s0iS2ELNlpb4wz.../high-rise-luxury-tower-development-san-francisco-skyline.png",
+    "Casa de la Costa": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgeVyfXHmN626XFR47zOGIc_T0lNr9ilcODJ9COiTiY4O9fwEgd026SD3xc5zNv5iHQHsMg8-D6tQUKkhRYX-DcTetFYjtCDzL5a808IPHOq8t-9ENtWJZOAE9ZkKZ_iwHapXIWcEl7XvOYkUcktipkRXn8VkQ7ErQ87ZN.../spanish-colonial-revival-architecture-montecito-estate.png",
+    "Oak Creek Reserve": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjRszFBOc89eknG3uwQYYcfEk9CrALXAkpnu6wx7U08o9hR4SfQOsjuZzpNHeZbKRgV-DAVJ1MYnLQu9rgYrXJuDGfPRdAjXShCTzhPR21R5En1SvB5o670PnZgii1qT6xqMZsTMghXP4OGib33NKMDt9fUqPkeZqogjQu.../modern-ranch-estate-calabasas-gated-community.png",
     "The Water's Edge": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgFenV0jPVYm4z0RrqiZzxP-8AWTIhZP7NRnj82gfmLsQGgWlYgNfhBqhg8M9Ow_BPZYZT0mvCJeipHFJy-akhyd4X-lpDeHPRka_95N7w9mujdcwWwJl9zI7abhHi7NhleO-nooB5-3EFT6guzzXvcdnHciYzzfWUmpvxFD6ZWx4_tA5BoEHx90OeR7joC/w640-h350/lake-sherwood-waterfront-contemporary-estate-architecture.png"
   };
 
+  // 🛑 START MOCK DATA BLOCK 🛑
+  // This array ensures projects display even if the base44 client crashes.
+  const MOCK_PROJECTS = [
+    {
+      id: "mock-1",
+      title: "Mulberry Woods",
+      location: "Beverly Hills, CA",
+      architectural_style: "Modern",
+      square_footage: "12,000 sq ft",
+      completion_year: 2024,
+      description: "A breathtaking contemporary estate designed with integrated smart home technology.",
+      features: ["Smart Home", "Infinity Pool", "Gated Access"]
+    },
+    {
+      id: "mock-2",
+      title: "The Aspen Estate",
+      location: "Malibu, CA",
+      architectural_style: "Contemporary",
+      square_footage: "9,500 sq ft",
+      completion_year: 2023,
+      description: "Oceanfront minimalist architecture with floor-to-ceiling glass and panoramic views.",
+      features: ["Ocean Views", "Private Beach Access", "Sustainable Materials"]
+    },
+    {
+      id: "mock-3",
+      title: "Casa de la Costa",
+      location: "Montecito, CA",
+      architectural_style: "Spanish Colonial",
+      square_footage: "7,000 sq ft",
+      completion_year: 2019,
+      description: "Timeless Spanish Revival with lush courtyards and authentic terracotta roofing.",
+      features: ["Courtyard", "Terracotta Roof", "Historic Charm"]
+    },
+    {
+      id: "mock-4",
+      title: "The Water's Edge",
+      location: "Lake Sherwood, CA",
+      architectural_style: "Modern Contemporary",
+      square_footage: "8,500 sq ft",
+      completion_year: 2023,
+      description: "Lakefront masterpiece featuring cantilevered decks and a private dock.",
+      features: ["Lakefront", "Private Dock", "Cantilevered Deck"]
+    }
+  ];
+
+  // 🛑 OVERRIDE: Skip the useQuery hook and inject the mock data 🛑
+  const projects = MOCK_PROJECTS;
+  const isLoading = false;
+
+  /*
+  // 💾 ORIGINAL CODE TO REVERT TO AFTER FIXING THE CRASH:
   const { data: projects, isLoading } = useQuery({
     queryKey: ['all-projects'],
     queryFn: () => base44.entities.Project.list()
   });
+  */
+  // 🛑 END MOCK DATA BLOCK 🛑
 
-  // Unique values for dropdowns
+
+  // Unique values for dropdowns (now derived from MOCK_PROJECTS)
   const locations = [...new Set(projects?.map(p => p.location).filter(Boolean))];
   const styles = [...new Set(projects?.map(p => p.architectural_style).filter(Boolean))];
+
+  // 🛑 FILTER LOGIC RE-ENABLED (Using mock data, this should work) 🛑
+  const filteredProjects = projects?.map(p => ({
+    ...p,
+    image_url: PROJECT_IMAGES[p.title] || p.image_url
+  })).filter(project => {
+    const matchLocation = !filters.location || project.location === filters.location;
+    const matchStyle = !filters.architecturalStyle || project.architectural_style === filters.architecturalStyle;
+    
+    // Simple parsing for sq ft comparison (assuming format "5,000 sq ft" or similar)
+    const sqFt = parseInt(project.square_footage?.replace(/[^0-9]/g, '') || 0);
+    const matchSqFt = !filters.minSquareFootage || sqFt >= parseInt(filters.minSquareFootage);
+    
+    // Year range
+    const year = project.year_built || parseInt(project.completion_year) || 0;
+    let matchYear = true;
+    if (filters.yearRange === 'new') matchYear = year >= 2023;
+    if (filters.yearRange === 'classic') matchYear = year < 2020;
+
+    return matchLocation && matchStyle && matchSqFt && matchYear;
+  });
+  // 🛑 END FILTER LOGIC 🛑
+
+
+  const clearFilters = () => {
+    setFilters({
+      location: '',
+      minSquareFootage: '',
+      architecturalStyle: '',
+      yearRange: 'all'
+    });
+  };
 
   return (
     <div className="pt-20 bg-stone-50 min-h-screen">
@@ -91,65 +185,4 @@ export default function Portfolio() {
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">Min Sq Footage</label>
                   <select 
-                    className="w-full p-2 border border-neutral-300 rounded-sm bg-stone-50 text-sm focus:outline-none focus:border-amber-500"
-                    value={filters.minSquareFootage}
-                    onChange={(e) => setFilters({...filters, minSquareFootage: e.target.value})}
-                  >
-                    <option value="">Any Size</option>
-                    <option value="5000">5,000+ sq ft</option>
-                    <option value="10000">10,000+ sq ft</option>
-                    <option value="15000">15,000+ sq ft</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">Era</label>
-                  <select 
-                    className="w-full p-2 border border-neutral-300 rounded-sm bg-stone-50 text-sm focus:outline-none focus:border-amber-500"
-                    value={filters.yearRange}
-                    onChange={(e) => setFilters({...filters, yearRange: e.target.value})}
-                  >
-                    <option value="all">All Years</option>
-                    <option value="new">New Construction (2023+)</option>
-                    <option value="classic">Established (Pre-2020)</option>
-                  </select>
-                </div>
-              </div>
-              <div className="flex justify-end mt-6">
-                <button onClick={clearFilters} className="text-xs text-neutral-500 hover:text-amber-600 flex items-center gap-1">
-                  <X size={12} /> Clear Filters
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="container mx-auto px-6 md:px-12 py-20">
-        {isLoading ? (
-          <div className="flex justify-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
-          </div>
-        ) : (
-          <>
-            <div className="mb-8 text-neutral-500 text-sm">
-              Showing {filteredProjects?.length} properties
-            </div>
-            
-            {filteredProjects?.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-20">
-                {filteredProjects.map((project, index) => (
-                  <ProjectCard key={project.id} project={project} index={index} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-20 bg-white border border-dashed border-neutral-300">
-                <p className="text-neutral-500 mb-4">No properties match your specific criteria.</p>
-                <button onClick={clearFilters} className="text-amber-600 font-medium hover:underline">Clear all filters</button>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
+                    className="w-full p-2 border border-neutral-300 rounded-sm bg-stone-50 text-sm focus:outline-none focus:border-
